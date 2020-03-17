@@ -3,7 +3,7 @@ import RPCClient from "../rpc/client";
 import { services } from "../definition";
 
 const client = new RPCClient(services, {
-  url: "http://localhost:3000/api/gateway"
+  url: "/api/gateway"
 });
 
 // Now let's do a Remote Procedure Call
