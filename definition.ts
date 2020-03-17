@@ -1,12 +1,10 @@
 // Definition of the RPC service
-export const helloServiceDefinition = {
-  getHello: {
+export const services = {
+  add: {
     request: {} as {
-      /** The language in which to say "Hello". */
-      language: string;
+      a: number;
+      b: number;
     },
-    response: {} as {
-      text: string;
-    }
+    response: {} as number
   }
 };

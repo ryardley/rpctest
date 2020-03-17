@@ -1,6 +1,7 @@
 // This is lifted from https://github.com/bufferapp/micro-rpc-client
 
 import fetch from "isomorphic-fetch";
+import { ServiceDefinition, RequestFor, MethodsFor } from "./common";
 
 type CredentialOptions = "include" | "omit" | "same-origin" | undefined;
 
@@ -17,19 +18,22 @@ type ParsedResponse = {
   response: any;
 };
 
-class RPCClient {
+class RPCClient<serviceDefinition extends ServiceDefinition> {
   url: string;
   sendCredentials: CredentialOptions;
-  constructor(options: Options = {}) {
+  constructor(_definition: serviceDefinition, options: Options = {}) {
     this.url = options.url || "http://localhost";
     this.sendCredentials = options.sendCredentials;
   }
 
-  listMethods() {
-    return this.call("methods");
-  }
+  // listMethods() {
+  //   return this.call("methods");
+  // }
 
-  call(name: string, ...args: any[]) {
+  async call<Method extends MethodsFor<serviceDefinition>>(
+    name: Method,
+    request: RequestFor<serviceDefinition, Method>
+  ) {
     return fetch(`${this.url}/${name}`, {
       method: "POST",
       headers: {
@@ -37,7 +41,7 @@ class RPCClient {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        args
+        args: request
       }),
       credentials: this.sendCredentials
     })

@@ -1,20 +1,12 @@
 // This is lifted from https://github.com/bufferapp/micro-rpc
 
-import { send, json, createError as microCreateError } from "micro";
-import { IncomingMessage, OutgoingMessage, ServerResponse } from "http";
+import { send, createError as microCreateError } from "micro";
 import { NextApiRequest, NextApiResponse } from "next";
+import { ServiceDefinition, MethodObj, MethodsFor, MethodFn } from "./common";
 
-type MethodFn = (
-  ...args: Array<any | IncomingMessage | OutgoingMessage>
-) => any;
-
-type Method = {
-  name: string;
-  fn: MethodFn;
-  docs?: string;
-};
-
-export function rpc(...methods: Method[]) {
+export const rpc = <serviceDefinition extends ServiceDefinition>(
+  _definition: serviceDefinition
+) => (...methods: MethodObj<serviceDefinition>[]) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const {
       query: { name },
@@ -23,11 +15,9 @@ export function rpc(...methods: Method[]) {
     const { args } = body;
     const matchingMethod = methods.find(method => method.name === name);
     if (matchingMethod) {
-      const parsedArgs = args ? args : [];
       try {
-        const result = Array.isArray(parsedArgs)
-          ? await matchingMethod.fn(...parsedArgs, req, res)
-          : await matchingMethod.fn(parsedArgs, req, res);
+        // Only unary functions are supported
+        const result = await matchingMethod.fn(args, req, res);
         send(res, 200, { result });
       } catch (err) {
         // error was handled
@@ -42,7 +32,7 @@ export function rpc(...methods: Method[]) {
       }
     } else if (name === "methods") {
       send(res, 200, {
-        result: methods
+        results: methods
           .map(method => ({
             name: method.name,
             docs: method.docs
@@ -58,9 +48,13 @@ export function rpc(...methods: Method[]) {
       });
     }
   };
-}
+};
 
-export function method(name: string, fn: MethodFn, docs?: string) {
+export function method<serviceDefinition extends ServiceDefinition>(
+  name: MethodsFor<serviceDefinition>,
+  fn: MethodFn<serviceDefinition, MethodsFor<serviceDefinition>>,
+  docs?: string
+): MethodObj<serviceDefinition> {
   return {
     name,
     fn,

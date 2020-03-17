@@ -1,8 +1,10 @@
 import { rpc, method } from "../../../rpc/index";
-import { IncomingMessage, OutgoingMessage, ServerResponse } from "http";
 import { NextApiRequest, NextApiResponse } from "next";
+import { services } from "../../../definition";
 
-const handler = rpc(method("add", (a: number, b: number) => a + b));
+const createHandler = rpc(services);
+
+const handler = createHandler(method("add", ({ a, b }) => a + b));
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const out = await handler(req, res);
