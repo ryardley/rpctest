@@ -1,1 +1,1 @@
-This can be extracted to an RPC client lib
+Happy to extract this to an RPC lib
