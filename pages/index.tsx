@@ -1,14 +1,12 @@
-import { ModuleRpcProtocolClient } from "rpc_ts/lib/protocol/client";
-import { helloServiceDefinition } from "../definition";
-
-const cilent = ModuleRpcProtocolClient.getRpcClient(helloServiceDefinition, {
-  remoteAddress: `http://localhost:5000/gateway`
+import RPCClient from "../rpc/client";
+const client = new RPCClient({
+  url: "http://localhost:3000/api/gateway"
 });
 
 // Now let's do a Remote Procedure Call
 async function rpc() {
-  const { text } = await cilent.getHello({ language: "Spanish" });
-  return text;
+  const result = await client.call("add", 2, 2);
+  return result;
 }
 
 export default () => (
