@@ -19,6 +19,6 @@ export default () => (
       alert(text);
     }}
   >
-    Hello
+    What is 2 + 2?
   </button>
 );

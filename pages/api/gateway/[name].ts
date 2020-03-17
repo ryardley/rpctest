@@ -1,4 +1,4 @@
-import { rpc, method } from "../../../rpc/index";
+import { rpc, method } from "../../../rpc/server";
 import { NextApiRequest, NextApiResponse } from "next";
 import { services } from "../../../definition";
 
